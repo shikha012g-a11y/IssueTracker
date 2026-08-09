@@ -3,48 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infra Channels Issue Tracker Dashboard</title>
+    <title>Issue Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-<!-- Top Navigation Header -->
+<!-- Header Navigation -->
 <header class="navbar">
     <div class="brand">
         <div class="logo">IT</div>
         <div>
-            <h1>Infra & Channels Tracker</h1>
-            <p>Issue Tracker & Monthly Metrics Breakdown</p>
+            <h1>Tracker</h1>
+            <p>Issue Tracking & Analytics Dashboard</p>
         </div>
     </div>
-    <div class="controls">
-        <div class="filter-group">
-            <label for="monthFilter">📅 Month Update Filter:</label>
-            <select id="monthFilter" onchange="handleMonthChange()">
-                <option value="">All Months</option>
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-            </select>
-        </div>
+    <div class="header-actions">
+        <button class="btn btn-export" onclick="exportToCSV()">📥 Export to CSV / Excel</button>
         <button class="btn btn-primary" onclick="openModal()">+ Add New Issue</button>
     </div>
 </header>
 
-<!-- Main Workspace Container -->
 <main class="container">
 
-    <!-- Top Overview Status Matrix (Matches Months_Update sheet) -->
+    <!-- Top Metrics Summary Cards -->
     <section class="card summary-section">
         <div class="section-title">
             <h2 id="summaryHeading">Overall Track Level Status Summary</h2>
@@ -52,7 +35,6 @@
         </div>
 
         <div class="metrics-grid">
-            <!-- Closed Card -->
             <div class="metric-card card-closed">
                 <h3>Closed Issues</h3>
                 <div class="big-number" id="closedTotal">0</div>
@@ -63,7 +45,6 @@
                 </div>
             </div>
 
-            <!-- Open with Bank Card -->
             <div class="metric-card card-bank">
                 <h3>Open with Bank</h3>
                 <div class="big-number" id="bankTotal">0</div>
@@ -74,7 +55,6 @@
                 </div>
             </div>
 
-            <!-- Open with Infosys & L3 Card -->
             <div class="metric-card card-infosys">
                 <h3>Open with Infosys & L3</h3>
                 <div class="big-number" id="infTotal">0</div>
@@ -87,59 +67,118 @@
         </div>
     </section>
 
-    <!-- Module Selection Grid (Dashboard View) -->
-    <section class="card" id="moduleSelectorSection">
+    <!-- Module Selection Grid -->
+    <section class="card">
         <div class="section-title">
             <h2>Select Module</h2>
         </div>
         <div class="modules-grid">
-            <button class="module-card active" onclick="selectModule('ALL')">
-                <span class="mod-icon">🌐</span> All Modules
-            </button>
-            <button class="module-card" onclick="selectModule('Channels')">
-                <span class="mod-icon">📲</span> Channels
-            </button>
-            <button class="module-card" onclick="selectModule('Infra')">
-                <span class="mod-icon">🖥️</span> Infra
-            </button>
-            <button class="module-card" onclick="selectModule('Trade Finance')">
-                <span class="mod-icon">📈</span> Trade Finance
-            </button>
-            <button class="module-card" onclick="selectModule('GBM')">
-                <span class="mod-icon">📊</span> GBM
-            </button>
-            <button class="module-card" onclick="selectModule('EOD/BOD')">
-                <span class="mod-icon">⚙️</span> EOD / BOD
-            </button>
-            <button class="module-card" onclick="selectModule('Loans')">
-                <span class="mod-icon">💰</span> Loans
-            </button>
-            <button class="module-card" onclick="selectModule('Deposits')">
-                <span class="mod-icon">🏦</span> Deposits
-            </button>
-            <button class="module-card" onclick="selectModule('CRM')">
-                <span class="mod-icon">👥</span> CRM
-            </button>
-            <button class="module-card" onclick="selectModule('Finacle Payments')">
-                <span class="mod-icon">💳</span> Finacle Payments
-            </button>
-            <button class="module-card" onclick="selectModule('FAS')">
-                <span class="mod-icon">📁</span> FAS
-            </button>
+            <button class="module-card active" onclick="selectModule('ALL')"><span class="mod-icon">🌐</span> All Modules</button>
+            <button class="module-card" onclick="selectModule('Channels')"><span class="mod-icon">📲</span> Channels</button>
+            <button class="module-card" onclick="selectModule('Infra')"><span class="mod-icon">🖥️</span> Infra</button>
+            <button class="module-card" onclick="selectModule('Trade Finance')"><span class="mod-icon">📈</span> Trade Finance</button>
+            <button class="module-card" onclick="selectModule('GBM')"><span class="mod-icon">📊</span> GBM</button>
+            <button class="module-card" onclick="selectModule('EOD/BOD')"><span class="mod-icon">⚙️</span> EOD / BOD</button>
+            <button class="module-card" onclick="selectModule('Loans')"><span class="mod-icon">💰</span> Loans</button>
+            <button class="module-card" onclick="selectModule('Deposits')"><span class="mod-icon">🏦</span> Deposits</button>
+            <button class="module-card" onclick="selectModule('CRM')"><span class="mod-icon">👥</span> CRM</button>
+            <button class="module-card" onclick="selectModule('Finacle Payments')"><span class="mod-icon">💳</span> Finacle Payments</button>
+            <button class="module-card" onclick="selectModule('FAS')"><span class="mod-icon">📁</span> FAS</button>
         </div>
     </section>
 
-    <!-- Detailed Table View (Matches INFRA_CHANNELS Excel sheet) -->
+    <!-- All Module Issues Data Section -->
     <section class="card">
-        <div class="table-header-row">
-            <h2 id="tableHeading">All Module Issues Data (INFRA_CHANNELS)</h2>
-            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="🔍 Search description, TOL ID, assignee...">
-        </div>
+        <div class="table-header-block">
+            <div class="table-title-row">
+                <h2 id="tableHeading">All Module Issues Data</h2>
+                <input type="text" id="searchInput" onkeyup="filterTableBySearch()" placeholder="🔍 Search description, TOL ID, assignee...">
+            </div>
 
+            <!-- Multi-Month Filter Bar & Advanced Filters -->
+            <div class="advanced-filters">
+                <!-- 📅 Dropdown Month Update Filter -->
+                <div class="filter-field">
+                    <label for="monthFilter">📅 Month Update Filter:</label>
+                    <select id="monthFilter" onchange="handleMonthChange()">
+                        <option value="">All Months</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+
+                <!-- Entity Filter -->
+                <div class="filter-field">
+                    <label>Entity:</label>
+                    <select id="filterEntity" onchange="applyFilters()">
+                        <option value="">All Entities</option>
+                        <option value="UAT">UAT</option>
+                        <option value="MIS">MIS</option>
+                        <option value="Domestic">Domestic</option>
+                        <option value="Overseas">Overseas</option>
+                    </select>
+                </div>
+
+                <!-- Environment Filter -->
+                <div class="filter-field">
+                    <label>Environment:</label>
+                    <select id="filterEnv" onchange="applyFilters()">
+                        <option value="">All Environments</option>
+                        <option value="PROD">PROD</option>
+                        <option value="MIS">MIS</option>
+                        <option value="UAT">UAT</option>
+                        <optgroup label="RRB Options">
+                            <option value="RRB - HGB">RRB - HGB</option>
+                            <option value="RRB - PGB">RRB - PGB</option>
+                            <option value="RRB - MGB">RRB - MGB</option>
+                            <option value="RRB - HMGB">RRB - HMGB</option>
+                            <option value="RRB - AGB">RRB - AGB</option>
+                            <option value="RRB - BGB">RRB - BGB</option>
+                            <option value="RRB - MRB">RRB - MRB</option>
+                            <option value="RRB - TGB">RRB - TGB</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- Closure Category Filter -->
+                <div class="filter-field">
+                    <label>Closure Category:</label>
+                    <select id="filterClosureCategory" onchange="applyFilters()">
+                        <option value="">All Categories</option>
+                        <option value="Closed">Closed</option>
+                        <option value="Closed with Fix">Closed with Fix</option>
+                        <option value="Closed with Clarification">Closed with Clarification</option>
+                        <option value="For Testing">For Testing</option>
+                        <option value="For New Requirement">For New Requirement</option>
+                    </select>
+                </div>
+
+                <!-- Assignee Filter -->
+                <div class="filter-field">
+                    <label>Assignee / Co-Assignee:</label>
+                    <input type="text" id="filterAssignee" placeholder="Search engineer..." onkeyup="applyFilters()">
+                </div>
+
+                <button class="btn btn-secondary" onclick="resetAllFilters()">Reset Filters</button>
+            </div>
+        </div> <!-- ✅ Closed table-header-block here -->
+
+        <!-- Table View with Selection Checkboxes -->
         <div class="table-wrapper">
             <table id="issuesTable">
                 <thead>
                 <tr>
+                    <th style="width: 40px;"><input type="checkbox" id="selectAllCheckbox" onclick="toggleSelectAll(this)"></th>
                     <th>Module</th>
                     <th>Entity</th>
                     <th>Env</th>
@@ -147,27 +186,53 @@
                     <th>Issue Description</th>
                     <th>L2 Analysis</th>
                     <th>TOL ID</th>
-                    <th>L3 Updates / Remarks</th>
+                    <th>L3 Updates</th>
                     <th>Issue Status</th>
+                    <th>Closure Category</th>
                     <th>Closure Date</th>
                     <th>Assignee</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
-                <tbody id="tableBody">
-                <!-- Dynamic Rows injected via JS -->
-                </tbody>
+                <tbody id="tableBody"></tbody>
             </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-bar">
+            <span id="pageInfo">Showing 0 of 0 entries</span>
+            <div class="pagination-controls">
+                <button class="btn-sm" id="prevBtn" onclick="changePage(-1)">Previous</button>
+                <span id="currentPageNum">Page 1</span>
+                <button class="btn-sm" id="nextBtn" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compact Visual Charts Section (Below Table) -->
+    <section class="card charts-container">
+        <div class="chart-box">
+            <h3>📊 Issue Status Distribution</h3>
+            <div class="chart-canvas-wrapper">
+                <canvas id="statusPieChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-box">
+            <h3>📈 Module-wise Issue Breakdown</h3>
+            <div class="chart-canvas-wrapper">
+                <canvas id="moduleBarChart"></canvas>
+            </div>
         </div>
     </section>
 </main>
 
-<!-- Modal Form for Inserting Issue Data (Write to DB) -->
+<!-- Modal Form (For Add & Edit) -->
 <div id="issueModal" class="modal">
     <div class="modal-content card">
         <span class="close-btn" onclick="closeModal()">&times;</span>
         <h2 id="formTitle">Add New Issue Details</h2>
         <form id="issueForm" onsubmit="saveIssue(event)">
+            <input type="hidden" id="formId">
             <div class="form-grid">
                 <div class="form-group">
                     <label>Module *</label>
@@ -184,70 +249,101 @@
                         <option value="FAS">FAS</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label>Entity *</label>
                     <select id="formEntity" required>
+                        <option value="UAT">UAT</option>
+                        <option value="MIS">MIS</option>
                         <option value="Domestic">Domestic</option>
-                        <option value="RRB">RRB</option>
                         <option value="Overseas">Overseas</option>
                     </select>
                 </div>
+
                 <div class="form-group">
-                    <label>Environment</label>
-                    <select id="formEnv">
+                    <label>Environment *</label>
+                    <select id="formEnv" required>
                         <option value="PROD">PROD</option>
                         <option value="UAT">UAT</option>
                         <option value="MIS">MIS</option>
+                        <optgroup label="RRB Banks">
+                            <option value="RRB - HGB">RRB - HGB</option>
+                            <option value="RRB - PGB">RRB - PGB</option>
+                            <option value="RRB - MGB">RRB - MGB</option>
+                            <option value="RRB - HMGB">RRB - HMGB</option>
+                            <option value="RRB - AGB">RRB - AGB</option>
+                            <option value="RRB - BGB">RRB - BGB</option>
+                            <option value="RRB - MRB">RRB - MRB</option>
+                            <option value="RRB - TGB">RRB - TGB</option>
+                        </optgroup>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label>Reported Date *</label>
                     <input type="date" id="formReportedDate" required>
                 </div>
+
                 <div class="form-group full-width">
                     <label>Issue Description *</label>
-                    <textarea id="formDescription" rows="3" required placeholder="Describe the issue reported..."></textarea>
+                    <textarea id="formDescription" rows="3" required placeholder="Describe issue..."></textarea>
                 </div>
+
                 <div class="form-group full-width">
                     <label>L2 Analysis</label>
-                    <textarea id="formL2" rows="2" placeholder="L2 team initial observation..."></textarea>
+                    <textarea id="formL2" rows="2" placeholder="L2 analysis..."></textarea>
                 </div>
+
                 <div class="form-group">
                     <label>TOL ID</label>
                     <input type="text" id="formTolId" placeholder="TOL-998822">
                 </div>
+
                 <div class="form-group">
                     <label>Issue Status *</label>
-                    <select id="formStatus" required>
+                    <select id="formStatus" required onchange="handleStatusChange()">
                         <option value="Closed">Closed</option>
-                        <option value="Open with Bank">Open with Bank</option>
+                        <option value="Open with Bank" selected>Open with Bank</option>
                         <option value="Open with Infosys and L3">Open with Infosys and L3</option>
                     </select>
                 </div>
+
                 <div class="form-group full-width">
                     <label>L3 Updates / Remarks</label>
-                    <textarea id="formL3" rows="2" placeholder="L3 observations and root cause..."></textarea>
+                    <textarea id="formL3" rows="2" placeholder="L3 updates..."></textarea>
                 </div>
+
+                <div class="form-group">
+                    <label>Closure Category (Shows for All Statuses)</label>
+                    <select id="formClosureCategory">
+                        <option value="">-- Select Closure Category --</option>
+                        <option value="Closed">Closed</option>
+                        <option value="Closed with Fix">Closed with Fix</option>
+                        <option value="Closed with Clarification">Closed with Clarification</option>
+                        <option value="For Testing">For Testing</option>
+                        <option value="For New Requirement">For New Requirement</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label>Closure Date</label>
                     <input type="date" id="formClosureDate">
                 </div>
-                <div class="form-group">
-                    <label>Closure Category</label>
-                    <input type="text" id="formClosureCategory" placeholder="Closed with Clarification">
-                </div>
+
                 <div class="form-group">
                     <label>Assignee</label>
-                    <input type="text" id="formAssignee" placeholder="Primary Engineer">
+                    <input type="text" id="formAssignee" placeholder="Assignee Name">
                 </div>
+
                 <div class="form-group">
                     <label>Co-Assignee</label>
-                    <input type="text" id="formCoAssignee" placeholder="Secondary Engineer">
+                    <input type="text" id="formCoAssignee" placeholder="Co-Assignee Name">
                 </div>
             </div>
+
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save </button>
+                <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </form>
     </div>

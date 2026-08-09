@@ -6,6 +6,7 @@ import com.Issue.Tracker.repository.IssueTrackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +18,14 @@ public class IssueTrackService {
     @Autowired
     private IssueTrackRepository repository;
 
-    public List<IssueTrack> getAllIssues(String module, Integer month, Integer year) {
-     return repository.filterIssues(module,month,year);
+    public List<IssueTrack> getAllIssues(String module, List<Integer> months, Integer year,
+                                         LocalDate startDate,LocalDate endDate, String assignee) {
+     return repository.filterIssues(
+             (module != null && !module.isEmpty() && !"ALL".equalsIgnoreCase(module)) ? module :null,
+             (months !=null && !months.isEmpty()) ? months :null,
+             year,startDate,endDate,
+             (assignee !=null && !assignee.trim().isEmpty()) ? assignee.trim() :null
+     );
     }
 
     public IssueTrack createIssue(IssueTrack issue) {
@@ -34,7 +41,7 @@ public class IssueTrackService {
             existing.setIssueDescription(updated.getIssueDescription());
             existing.setL2Analysis(updated.getL2Analysis());
             existing.setTolId(updated.getTolId());
-            existing.setl3UpdatesRemarks(updated.getl3UpdatesRemarks());
+            existing.setL3UpdatesRemarks(updated.getL3UpdatesRemarks());
             existing.setIssueStatus(updated.getIssueStatus());
             existing.setClosureDate(updated.getClosureDate());
             existing.setClosureCategory(updated.getClosureCategory());
@@ -48,23 +55,33 @@ public class IssueTrackService {
         repository.deleteById(id);
     }
 
-    public Map<String, Object> getMonthlySummaryCounts(String module, Integer month) {
+    public Map<String, Object> getMonthlySummaryCounts(String module, List<Integer> months) {
     Map<String,Object> summary = new HashMap<>();
 
+    String targetModule = (module != null && !module.isEmpty() && !"ALL".equalsIgnoreCase(module)) ? module : null;
+    List<Integer> targetMonth = (months != null && !months.isEmpty()) ? months : null;
+
     String[] statuses = {"Closed", "Open with Bank", "Open with Infosys and L3"};
-    List<IssueSummaryDto> summaryList = new ArrayList<>();
+    List<Map<String, Object>> summaryList = new ArrayList<>();
 
     for (String status : statuses){
-        long domestic = repository.countByStatusAndEntity(module, status, "Domestic",month);
-        long rrb = repository.countByStatusAndEntity(module, status,"RRB", month);
-        long overseas = repository.countByStatusAndEntity(module, status, "overseas", month);
+        long domestic = repository.countByStatusAndEntity(targetModule, status, "Domestic",targetMonth);
+        long rrb = repository.countByStatusAndEntity(targetModule, status,"RRB", targetMonth);
+        long overseas = repository.countByStatusAndEntity(targetModule, status, "overseas", targetMonth);
         long total = domestic + rrb+ overseas;
 
-        summaryList.add(new IssueSummaryDto(status,domestic,rrb,overseas,total));
+        Map<String ,Object> row = new HashMap<>();
+        row.put("category",status);
+        row.put("domesticCount",domestic);
+        row.put("rrbCount", rrb);
+        row.put("overseasCount",overseas);
+        row.put("totalCount", total);
+        summaryList.add(row);
+
     }
 
     summary.put("matrix", summaryList);
-    summary.put("totalIssues", repository.filterIssues(module, month,null).size());
+    //summary.put("totalIssues", repository.filterIssues(module, month,null).size());
     return summary;
     }
 }

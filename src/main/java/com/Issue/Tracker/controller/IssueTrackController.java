@@ -3,28 +3,33 @@ package com.Issue.Tracker.controller;
 import com.Issue.Tracker.Entity.IssueTrack;
 import com.Issue.Tracker.service.IssueTrackService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/issues")
-@CrossOrigin(origins = "*") //Allows Local HTML frontend access
+@CrossOrigin(origins = "*", allowedHeaders = "*") //Allows Local HTML frontend access
 public class IssueTrackController {
 
     @Autowired
     private IssueTrackService service;
 
-    @GetMapping
+    @GetMapping({"", "/"})
     public List<IssueTrack> getIssues(@RequestParam(required = false) String module,
-                                      @RequestParam(required = false) Integer month,
-                                      @RequestParam(required = false) Integer year){
-        return service.getAllIssues(module, month,year);
+                                      @RequestParam(required = false) List<Integer> months,
+                                      @RequestParam(required = false) Integer year,
+                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate startDate,
+                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                      @RequestParam(required = false) String assignee){
+        return service.getAllIssues(module, months,year,startDate,endDate,assignee);
     }
 
-    @PostMapping
+    @PostMapping({"", "/"})
     public IssueTrack createIssue(@RequestBody IssueTrack issue){
         return service.createIssue(issue);
     }
@@ -41,8 +46,8 @@ public class IssueTrackController {
 
     @GetMapping("/summary")
     public Map<String, Object> getSummary(@RequestParam(required = false) String module,
-                                          @RequestParam(required = false) Integer month){
-        return service.getMonthlySummaryCounts(module,month);
+                                          @RequestParam(required = false) List<Integer> months){
+        return service.getMonthlySummaryCounts(module,months);
     }
 
 

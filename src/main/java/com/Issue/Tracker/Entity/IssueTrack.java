@@ -1,5 +1,6 @@
 package com.Issue.Tracker.Entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
@@ -7,6 +8,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name="Tracker")
+
 public class IssueTrack {
 
     @Id
@@ -14,19 +16,20 @@ public class IssueTrack {
     @JsonProperty("id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "module", nullable = false)
     @JsonProperty("module")
     private String module;
 
-    @Column(nullable = false)
+    @Column(name = "entity", nullable = false)
     @JsonProperty("entity")
     private String entity;
 
-    @Column(nullable = false)
+    @Column(name = "environment", nullable = false)
     @JsonProperty("environment")
     private String environment;
 
     @Column(name = "reported_date", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonProperty("reportedDate")
     private LocalDate reportedDate;
 
@@ -51,6 +54,7 @@ public class IssueTrack {
     private String issueStatus;
 
     @Column(name = "closure_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonProperty("closureDate")
     private LocalDate closureDate;
 
@@ -58,11 +62,12 @@ public class IssueTrack {
     @JsonProperty("closureCategory")
     protected String closureCategory;
 
-    @Column(name = "assignee")
+    @Column(name = "assignee", nullable = false)
     @JsonProperty("assignee")
     private String assignee;
 
     @JsonProperty("coAssignee")
+    @Column(name = "coAssignee")
     protected String coAssignee;
 
 
@@ -84,7 +89,7 @@ public class IssueTrack {
         this.issueDescription = issueDescription;
         this.l2Analysis = l2Analysis;
         this.tolId = tolId;
-        l3UpdatesRemarks = l3UpdatesRemarks;
+        this.l3UpdatesRemarks = l3UpdatesRemarks;
         this.closureDate = closureDate;
         this.issueStatus = issueStatus;
         this.closureCategory = closureCategory;
@@ -156,12 +161,12 @@ public class IssueTrack {
         this.tolId = tolId;
     }
 
-    public String getl3UpdatesRemarks() {
+    public String getL3UpdatesRemarks() {
         return l3UpdatesRemarks;
     }
 
-    public void setl3UpdatesRemarks(String l3UpdatesRemarks) {
-        l3UpdatesRemarks = l3UpdatesRemarks;
+    public void setL3UpdatesRemarks(String l3UpdatesRemarks) {
+        this.l3UpdatesRemarks = l3UpdatesRemarks;
     }
 
     public String getIssueStatus() {
