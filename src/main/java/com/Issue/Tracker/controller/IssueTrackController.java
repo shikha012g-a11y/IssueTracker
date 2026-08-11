@@ -4,6 +4,7 @@ import com.Issue.Tracker.Entity.IssueTrack;
 import com.Issue.Tracker.service.IssueTrackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -50,5 +51,9 @@ public class IssueTrackController {
         return service.getMonthlySummaryCounts(module,months);
     }
 
-
+    @PostMapping("/batch")
+    public ResponseEntity<List<IssueTrack>> createBatchIssues(@RequestBody List<IssueTrack> issues){
+        List<IssueTrack> savedIssues = service.saveAllIssues(issues);
+        return ResponseEntity.ok(savedIssues);
+    }
 }

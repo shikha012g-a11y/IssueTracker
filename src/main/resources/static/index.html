@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Issue Tracker</title>
+    <title>Issue Tracker Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -20,8 +21,9 @@
         </div>
     </div>
     <div class="header-actions">
-        <button class="btn btn-export" onclick="exportToCSV()">📥 Export to CSV / Excel</button>
-        <button class="btn btn-primary" onclick="openModal()">+ Add New Issue</button>
+        <button type="button" class="btn btn-secondary" onclick="window.openImportModal()">📤 Import Excel</button>
+        <button type="button" class="btn btn-export" onclick="window.exportToCSV()">📥 Export to CSV / Excel</button>
+        <button type="button" class="btn btn-primary" onclick="window.openModal()">+ Add New Issue</button>
     </div>
 </header>
 
@@ -67,39 +69,124 @@
         </div>
     </section>
 
-    <!-- Module Selection Grid (With Month Count Button) -->
+    <!-- Module Selection Grid (Includes TOL Details Button) -->
     <section class="card">
         <div class="section-title">
             <h2>Select Module</h2>
         </div>
         <div class="modules-grid">
-            <button class="module-card active" onclick="selectModule('ALL')"><span class="mod-icon">🌐</span> All Modules</button>
-            <button class="module-card highlight-card" onclick="selectModule('MONTH_COUNT')"><span class="mod-icon">📅</span> Month Count</button>
-            <button class="module-card" onclick="selectModule('Channels')"><span class="mod-icon">📲</span> Channels</button>
-            <button class="module-card" onclick="selectModule('Infra')"><span class="mod-icon">🖥️</span> Infra</button>
-            <button class="module-card" onclick="selectModule('Trade Finance')"><span class="mod-icon">📈</span> Trade Finance</button>
-            <button class="module-card" onclick="selectModule('GBM')"><span class="mod-icon">📊</span> GBM</button>
-            <button class="module-card" onclick="selectModule('EOD/BOD')"><span class="mod-icon">⚙️</span> EOD / BOD</button>
-            <button class="module-card" onclick="selectModule('Loans')"><span class="mod-icon">💰</span> Loans</button>
-            <button class="module-card" onclick="selectModule('Deposits')"><span class="mod-icon">🏦</span> Deposits</button>
-            <button class="module-card" onclick="selectModule('CRM')"><span class="mod-icon">👥</span> CRM</button>
-            <button class="module-card" onclick="selectModule('Finacle Payments')"><span class="mod-icon">💳</span> Finacle Payments</button>
-            <button class="module-card" onclick="selectModule('FAS')"><span class="mod-icon">📁</span> FAS</button>
+            <button type="button" class="module-card active" onclick="window.selectModule('ALL')"><span class="mod-icon">🌐</span> All Modules</button>
+            <button type="button" class="module-card highlight-card" onclick="window.selectModule('MONTH_COUNT')"><span class="mod-icon">📅</span> Month Count</button>
+            <button type="button" class="module-card highlight-card" style="border-color:#34d399; background:rgba(16,185,129,0.15); color:#34d399;" onclick="window.selectModule('TOL_DETAILS')"><span class="mod-icon">🎫</span> TOL Details</button>
+            <button type="button" class="module-card" onclick="window.selectModule('Channels')"><span class="mod-icon">📲</span> Channels</button>
+            <button type="button" class="module-card" onclick="window.selectModule('Infra')"><span class="mod-icon">🖥️</span> Infra</button>
+            <button type="button" class="module-card" onclick="window.selectModule('Trade Finance')"><span class="mod-icon">📈</span> Trade Finance</button>
+            <button type="button" class="module-card" onclick="window.selectModule('GBM')"><span class="mod-icon">📊</span> GBM</button>
+            <button type="button" class="module-card" onclick="window.selectModule('EOD/BOD')"><span class="mod-icon">⚙️</span> EOD / BOD</button>
+            <button type="button" class="module-card" onclick="window.selectModule('Loans')"><span class="mod-icon">💰</span> Loans</button>
+            <button type="button" class="module-card" onclick="window.selectModule('Deposits')"><span class="mod-icon">🏦</span> Deposits</button>
+            <button type="button" class="module-card" onclick="window.selectModule('CRM')"><span class="mod-icon">👥</span> CRM</button>
+            <button type="button" class="module-card" onclick="window.selectModule('Finacle Payments')"><span class="mod-icon">💳</span> Finacle Payments</button>
+            <button type="button" class="module-card" onclick="window.selectModule('FAS')"><span class="mod-icon">📁</span> FAS</button>
         </div>
     </section>
 
+    <!-- 🎫 DEDICATED "TOL DETAILS" SECTION -->
+    <section class="card" id="tolDetailsPageSection" style="display: none;">
+        <div class="month-count-header">
+            <h2>🎫 TOL Details & Ticket Tracking Dashboard</h2>
+            <p>Module-wise TOL ticket status, raise/closure dates, L2/L3 remarks & assignees</p>
+        </div>
 
-    <!-- DEDICATED "MONTH COUNT" SUMMARY REPORT PAGE SECTION -->
-    <!-- DEDICATED "MONTH COUNT" SUMMARY REPORT PAGE SECTION -->
+        <!-- TOL Summary Metrics -->
+        <div class="metrics-grid" style="margin-bottom: 1.5rem;">
+            <div class="metric-card" style="border-color: #60a5fa;">
+                <h3>Total TOL Tickets</h3>
+                <div class="big-number" id="tolTotalCount">0</div>
+            </div>
+            <div class="metric-card card-bank">
+                <h3>Open with L2</h3>
+                <div class="big-number" id="tolOpenL2Count">0</div>
+            </div>
+            <div class="metric-card card-infosys">
+                <h3>Open with L3</h3>
+                <div class="big-number" id="tolOpenL3Count">0</div>
+            </div>
+            <div class="metric-card card-closed">
+                <h3>Closed TOLs</h3>
+                <div class="big-number" id="tolClosedCount">0</div>
+            </div>
+        </div>
+
+        <!-- TOL Filter Bar -->
+        <div class="advanced-filters" style="margin-bottom: 1rem;">
+            <div class="filter-field">
+                <label>Filter by Module:</label>
+                <select id="tolModuleFilter" onchange="window.filterTolTable()">
+                    <option value="">All Modules</option>
+                    <option value="Channels">Channels</option>
+                    <option value="Infra">Infra</option>
+                    <option value="Trade Finance">Trade Finance</option>
+                    <option value="GBM">GBM</option>
+                    <option value="EOD/BOD">EOD/BOD</option>
+                    <option value="Loans">Loans</option>
+                    <option value="Deposits">Deposits</option>
+                    <option value="CRM">CRM</option>
+                    <option value="Finacle Payments">Finacle Payments</option>
+                    <option value="FAS">FAS</option>
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label>Filter by TOL Status:</label>
+                <select id="tolStatusFilter" onchange="window.filterTolTable()">
+                    <option value="">All Statuses</option>
+                    <option value="Open with L2">Open with L2</option>
+                    <option value="Open with L3">Open with L3</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label>Search TOL ID / Description:</label>
+                <input type="text" id="tolSearchInput" placeholder="🔍 Search TOL ID..." onkeyup="window.filterTolTable()">
+            </div>
+        </div>
+
+        <!-- TOL Data Table -->
+        <div class="table-wrapper">
+            <table class="excel-domain-table" style="font-size: 0.8rem;">
+                <thead>
+                <tr>
+                    <th>TOL ID</th>
+                    <th>Module</th>
+                    <th>TOL Description</th>
+                    <th>TOL Raise Date</th>
+                    <th>Entity</th>
+                    <th>Env</th>
+                    <th>L2 Remarks</th>
+                    <th>L2 Assignee</th>
+                    <th>L3 Remarks</th>
+                    <th>L3 Assignee</th>
+                    <th>TOL Closed Date</th>
+                    <th>TOL Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="tolTableBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- DEDICATED MONTH COUNT SUMMARY REPORT SECTION -->
     <section class="card" id="monthCountPageSection" style="display: none;">
         <div class="month-count-header">
             <h2>📊 Track Level Monthly Issue Status Report</h2>
             <p>Module & Domain breakdown counts matching Months_Update Excel format</p>
 
-            <!-- 📅 Month Selection Control on Top of Month Count Page -->
             <div class="month-count-filter-bar" style="margin-top: 1rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
                 <label for="monthCountFilter" style="font-size: 0.9rem; color: var(--text-sub);">📅 Select Month for Report:</label>
-                <select id="monthCountFilter" onchange="handleMonthCountFilterChange()" style="padding: 0.5rem 1rem; font-size: 0.9rem; border-radius: 6px;">
+                <select id="monthCountFilter" onchange="window.handleMonthCountFilterChange()" style="padding: 0.5rem 1rem; font-size: 0.9rem; border-radius: 6px;">
                     <option value="">All Months</option>
                     <option value="1">January</option>
                     <option value="2">February</option>
@@ -117,7 +204,7 @@
             </div>
         </div>
 
-        <!-- 1️⃣ SEPARATE TABLE 1: Issue Data -->
+        <!-- Table 1: Issue Data -->
         <div class="table-wrapper month-matrix-wrapper">
             <h3 style="color: #a78bfa; margin-bottom: 0.8rem;">Issue Data</h3>
             <table class="excel-styled-table">
@@ -138,8 +225,8 @@
             </table>
         </div>
 
-        <!-- 2️⃣ SEPARATE TABLE 2: Track Level Issue Status -->
-        <div class="table-wrapper month-matrix-wrapper" style="margin-top: 2rem;">
+        <!-- Table 2: Track Level Issue Status -->
+        <div class="table-wrapper month-matrix-wrapper" style="margin-top: 1.5rem;">
             <h3 style="color: #60a5fa; margin-bottom: 0.8rem;">Track Level Issue Status</h3>
             <table class="excel-styled-table">
                 <thead>
@@ -156,7 +243,7 @@
         </div>
 
         <!-- Domain Grouped Breakdown Tables -->
-        <div class="domain-tables-grid" style="margin-top: 2rem;">
+        <div class="domain-tables-grid" style="margin-top: 1.5rem;">
             <div class="domain-box">
                 <h4>CBS Application Infra Services & Channels</h4>
                 <table class="excel-domain-table">
@@ -188,8 +275,7 @@
             </div>
         </div>
 
-        <!-- Entity Level Grand Summary Table -->
-        <div class="grand-summary-box">
+        <div class="grand-summary-box" style="margin-top: 1.5rem;">
             <h4>Entity Level Overall Summary</h4>
             <table class="excel-domain-table grand-table">
                 <thead>
@@ -200,20 +286,18 @@
         </div>
     </section>
 
-    <!-- All Module Issues Data Section -->
+    <!-- Standard Issues Table Section -->
     <section class="card" id="issuesTableSection">
         <div class="table-header-block">
             <div class="table-title-row">
                 <h2 id="tableHeading">All Module Issues Data</h2>
-                <input type="text" id="searchInput" onkeyup="filterTableBySearch()" placeholder="🔍 Search description, TOL ID, assignee...">
+                <input type="text" id="searchInput" onkeyup="window.filterTableBySearch()" placeholder="🔍 Search description, TOL ID, assignee...">
             </div>
 
-            <!-- Multi-Month Filter Bar & Advanced Filters -->
             <div class="advanced-filters">
-                <!-- 📅 Dropdown Month Update Filter -->
                 <div class="filter-field">
                     <label for="monthFilter">📅 Month Update Filter:</label>
-                    <select id="monthFilter" onchange="handleMonthChange()">
+                    <select id="monthFilter" onchange="window.handleMonthChange()">
                         <option value="">All Months</option>
                         <option value="1">January</option>
                         <option value="2">February</option>
@@ -230,10 +314,9 @@
                     </select>
                 </div>
 
-                <!-- Entity Filter -->
                 <div class="filter-field">
                     <label>Entity:</label>
-                    <select id="filterEntity" onchange="applyFilters()">
+                    <select id="filterEntity" onchange="window.applyFilters()">
                         <option value="">All Entities</option>
                         <option value="UAT">UAT</option>
                         <option value="MIS">MIS</option>
@@ -242,10 +325,9 @@
                     </select>
                 </div>
 
-                <!-- Environment Filter -->
                 <div class="filter-field">
                     <label>Environment:</label>
-                    <select id="filterEnv" onchange="applyFilters()">
+                    <select id="filterEnv" onchange="window.applyFilters()">
                         <option value="">All Environments</option>
                         <option value="PROD">PROD</option>
                         <option value="MIS">MIS</option>
@@ -263,10 +345,9 @@
                     </select>
                 </div>
 
-                <!-- Issue Status Filter -->
                 <div class="filter-field">
                     <label>Issue Status:</label>
-                    <select id="filterStatus" onchange="applyFilters()">
+                    <select id="filterStatus" onchange="window.applyFilters()">
                         <option value="">All Statuses</option>
                         <option value="Closed">Closed</option>
                         <option value="Open with Bank">Open with Bank</option>
@@ -274,22 +355,31 @@
                     </select>
                 </div>
 
-                <!-- Assignee Filter -->
                 <div class="filter-field">
-                    <label>Assignee / Co-Assignee:</label>
-                    <input type="text" id="filterAssignee" placeholder="Search engineer..." onkeyup="applyFilters()">
+                    <label>Closure Category:</label>
+                    <select id="filterClosureCategory" onchange="window.applyFilters()">
+                        <option value="">All Categories</option>
+                        <option value="Closed with Fix">Closed with Fix</option>
+                        <option value="Closed with Clarification">Closed with Clarification</option>
+                        <option value="For Testing">For Testing</option>
+                        <option value="For New Requirement">For New Requirement</option>
+                    </select>
                 </div>
 
-                <button class="btn btn-secondary" onclick="resetAllFilters()">Reset Filters</button>
+                <div class="filter-field">
+                    <label>Assignee Search:</label>
+                    <input type="text" id="filterAssignee" placeholder="Search engineer..." onkeyup="window.applyFilters()">
+                </div>
+
+                <button type="button" class="btn btn-secondary" onclick="window.resetAllFilters()">Reset Filters</button>
             </div>
         </div>
 
-        <!-- Table View with Selection Checkboxes -->
         <div class="table-wrapper">
             <table id="issuesTable">
                 <thead>
                 <tr>
-                    <th style="width: 40px;"><input type="checkbox" id="selectAllCheckbox" onclick="toggleSelectAll(this)"></th>
+                    <th style="width: 40px;"><input type="checkbox" id="selectAllCheckbox" onclick="window.toggleSelectAll(this)"></th>
                     <th>Module</th>
                     <th>Entity</th>
                     <th>Env</th>
@@ -297,12 +387,12 @@
                     <th>Issue Description</th>
                     <th>L2 Analysis</th>
                     <th>TOL ID</th>
-                    <th>L3 Assignee</th>
                     <th>L3 Updates</th>
                     <th>Issue Status</th>
                     <th>Closure Category</th>
                     <th>Closure Date</th>
                     <th>Assignee</th>
+                    <th>L3 Assignee</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -310,18 +400,17 @@
             </table>
         </div>
 
-        <!-- Pagination Controls -->
         <div class="pagination-bar">
             <span id="pageInfo">Showing 0 of 0 entries</span>
             <div class="pagination-controls">
-                <button class="btn-sm" id="prevBtn" onclick="changePage(-1)">Previous</button>
+                <button type="button" class="btn-sm" id="prevBtn" onclick="window.changePage(-1)">Previous</button>
                 <span id="currentPageNum">Page 1</span>
-                <button class="btn-sm" id="nextBtn" onclick="changePage(1)">Next</button>
+                <button type="button" class="btn-sm" id="nextBtn" onclick="window.changePage(1)">Next</button>
             </div>
         </div>
     </section>
 
-    <!-- Compact Visual Charts Section (Below Table) -->
+    <!-- Visual Charts Section -->
     <section class="card charts-container" id="chartsSection">
         <div class="chart-box">
             <h3>📊 Issue Status Distribution</h3>
@@ -338,12 +427,12 @@
     </section>
 </main>
 
-<!-- Modal Form (For Add & Edit) -->
+<!-- Add / Edit Issue Modal -->
 <div id="issueModal" class="modal">
     <div class="modal-content card">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <span class="close-btn" onclick="window.closeModal()">&times;</span>
         <h2 id="formTitle">Add New Issue Details</h2>
-        <form id="issueForm" onsubmit="saveIssue(event)">
+        <form id="issueForm" onsubmit="window.saveIssue(event)">
             <input type="hidden" id="formId">
             <div class="form-grid">
                 <div class="form-group">
@@ -413,7 +502,7 @@
 
                 <div class="form-group">
                     <label>Issue Status *</label>
-                    <select id="formStatus" required onchange="handleStatusChange()">
+                    <select id="formStatus" required onchange="window.handleStatusChange()">
                         <option value="Closed">Closed</option>
                         <option value="Open with Bank" selected>Open with Bank</option>
                         <option value="Open with Infosys and L3">Open with Infosys and L3</option>
@@ -426,10 +515,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Closure Category (Shows for All Statuses)</label>
+                    <label>Closure Category</label>
                     <select id="formClosureCategory">
                         <option value="">-- Select Closure Category --</option>
-                        <option value="Closed">Closed</option>
                         <option value="Closed with Fix">Closed with Fix</option>
                         <option value="Closed with Clarification">Closed with Clarification</option>
                         <option value="For Testing">For Testing</option>
@@ -443,11 +531,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label>L3 Assignee</label>
-                    <input type="text" id="formL3Assignee" placeholder=" L3 Assignee Name">
-                </div>
-
-                <div class="form-group">
                     <label>Assignee *</label>
                     <input type="text" id="formAssignee" placeholder="Assignee Name">
                 </div>
@@ -456,13 +539,64 @@
                     <label>Co-Assignee</label>
                     <input type="text" id="formCoAssignee" placeholder="Co-Assignee Name">
                 </div>
+
+                <div class="form-group">
+                    <label>L3 Assignee</label>
+                    <input type="text" id="formL3Assignee" placeholder="L3 Assignee Name">
+                </div>
             </div>
 
             <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="button" class="btn btn-secondary" onclick="window.closeModal()">Cancel</button>
                 <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Excel Import Modal -->
+<div id="importModal" class="modal">
+    <div class="modal-content card" style="max-width: 850px;">
+        <span class="close-btn" onclick="window.closeImportModal()">&times;</span>
+        <h2>📤 Import Issues from Excel / CSV</h2>
+        <p style="color: var(--text-sub); font-size: 0.85rem; margin-bottom: 1rem;">
+            Upload an Excel (.xlsx, .xls) or CSV file. All matching rows will be validated and imported into your database.
+        </p>
+
+        <div class="file-drop-zone" onclick="document.getElementById('excelFileInput').click()">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
+            <strong>Click to browse or drag & drop Excel file here</strong>
+            <span style="font-size: 0.75rem; color: var(--text-sub); display: block; margin-top: 4px;">Supports .xlsx, .xls, .csv</span>
+            <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display: none;" onchange="window.handleExcelFileSelect(event)">
+        </div>
+
+        <div id="importStatusBanner" style="display: none; margin-top: 1rem; padding: 0.8rem; border-radius: 6px; font-size: 0.85rem;"></div>
+
+        <div id="importPreviewWrapper" style="display: none; margin-top: 1rem;">
+            <h3 style="font-size: 0.95rem; color: #60a5fa; margin-bottom: 0.5rem;">Parsed Rows Preview (<span id="parsedRowsCount">0</span> records)</h3>
+            <div class="table-wrapper" style="max-height: 220px; overflow-y: auto;">
+                <table class="excel-domain-table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Module</th>
+                        <th>Entity</th>
+                        <th>Env</th>
+                        <th>Reported Date</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Assignee</th>
+                    </tr>
+                    </thead>
+                    <tbody id="importPreviewBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" onclick="window.closeImportModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" id="confirmImportBtn" style="display: none;" onclick="window.confirmImport()">Import Records to DB</button>
+        </div>
     </div>
 </div>
 

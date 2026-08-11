@@ -84,4 +84,8 @@ public class IssueTrackService {
     //summary.put("totalIssues", repository.filterIssues(module, month,null).size());
     return summary;
     }
+
+    public List<IssueTrack> saveAllIssues(List<IssueTrack> issues) {
+        return repository.saveAll(issues);
+    }
 }
