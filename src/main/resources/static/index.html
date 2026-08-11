@@ -67,13 +67,14 @@
         </div>
     </section>
 
-    <!-- Module Selection Grid -->
+    <!-- Module Selection Grid (With Month Count Button) -->
     <section class="card">
         <div class="section-title">
             <h2>Select Module</h2>
         </div>
         <div class="modules-grid">
             <button class="module-card active" onclick="selectModule('ALL')"><span class="mod-icon">🌐</span> All Modules</button>
+            <button class="module-card highlight-card" onclick="selectModule('MONTH_COUNT')"><span class="mod-icon">📅</span> Month Count</button>
             <button class="module-card" onclick="selectModule('Channels')"><span class="mod-icon">📲</span> Channels</button>
             <button class="module-card" onclick="selectModule('Infra')"><span class="mod-icon">🖥️</span> Infra</button>
             <button class="module-card" onclick="selectModule('Trade Finance')"><span class="mod-icon">📈</span> Trade Finance</button>
@@ -87,8 +88,120 @@
         </div>
     </section>
 
+
+    <!-- DEDICATED "MONTH COUNT" SUMMARY REPORT PAGE SECTION -->
+    <!-- DEDICATED "MONTH COUNT" SUMMARY REPORT PAGE SECTION -->
+    <section class="card" id="monthCountPageSection" style="display: none;">
+        <div class="month-count-header">
+            <h2>📊 Track Level Monthly Issue Status Report</h2>
+            <p>Module & Domain breakdown counts matching Months_Update Excel format</p>
+
+            <!-- 📅 Month Selection Control on Top of Month Count Page -->
+            <div class="month-count-filter-bar" style="margin-top: 1rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+                <label for="monthCountFilter" style="font-size: 0.9rem; color: var(--text-sub);">📅 Select Month for Report:</label>
+                <select id="monthCountFilter" onchange="handleMonthCountFilterChange()" style="padding: 0.5rem 1rem; font-size: 0.9rem; border-radius: 6px;">
+                    <option value="">All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 1️⃣ SEPARATE TABLE 1: Issue Data -->
+        <div class="table-wrapper month-matrix-wrapper">
+            <h3 style="color: #a78bfa; margin-bottom: 0.8rem;">Issue Data</h3>
+            <table class="excel-styled-table">
+                <thead>
+                <tr class="header-row-1">
+                    <th rowspan="2">Modules</th>
+                    <th colspan="3" class="th-closed">Closed</th>
+                    <th colspan="3" class="th-infosys">Open with Infosys</th>
+                    <th colspan="3" class="th-bank">Open with Bank</th>
+                </tr>
+                <tr class="header-row-2">
+                    <th>Domestic</th><th>RRB</th><th>Overseas</th>
+                    <th>Domestic</th><th>RRB</th><th>Overseas</th>
+                    <th>Domestic</th><th>RRB</th><th>Overseas</th>
+                </tr>
+                </thead>
+                <tbody id="issueDataMatrixBody"></tbody>
+            </table>
+        </div>
+
+        <!-- 2️⃣ SEPARATE TABLE 2: Track Level Issue Status -->
+        <div class="table-wrapper month-matrix-wrapper" style="margin-top: 2rem;">
+            <h3 style="color: #60a5fa; margin-bottom: 0.8rem;">Track Level Issue Status</h3>
+            <table class="excel-styled-table">
+                <thead>
+                <tr class="header-row-1">
+                    <th>Modules</th>
+                    <th class="th-closed">Total Closed</th>
+                    <th class="th-infosys">Total Open Infosys</th>
+                    <th class="th-bank">Total Open Bank</th>
+                    <th class="th-summary">Grand Total</th>
+                </tr>
+                </thead>
+                <tbody id="trackLevelStatusBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Domain Grouped Breakdown Tables -->
+        <div class="domain-tables-grid" style="margin-top: 2rem;">
+            <div class="domain-box">
+                <h4>CBS Application Infra Services & Channels</h4>
+                <table class="excel-domain-table">
+                    <thead>
+                    <tr><th>Entity</th><th>Closed</th><th>Open with Infosys</th><th>Open with Bank</th><th>Total</th></tr>
+                    </thead>
+                    <tbody id="group1Body"></tbody>
+                </table>
+            </div>
+
+            <div class="domain-box">
+                <h4>Finacle Payments/OE & FAS</h4>
+                <table class="excel-domain-table">
+                    <thead>
+                    <tr><th>Entity</th><th>Closed</th><th>Open with Infosys</th><th>Open with Bank</th><th>Total</th></tr>
+                    </thead>
+                    <tbody id="group2Body"></tbody>
+                </table>
+            </div>
+
+            <div class="domain-box">
+                <h4>CBS modules</h4>
+                <table class="excel-domain-table">
+                    <thead>
+                    <tr><th>Entity</th><th>Closed</th><th>Open with Infosys</th><th>Open with Bank</th><th>Total</th></tr>
+                    </thead>
+                    <tbody id="group3Body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Entity Level Grand Summary Table -->
+        <div class="grand-summary-box">
+            <h4>Entity Level Overall Summary</h4>
+            <table class="excel-domain-table grand-table">
+                <thead>
+                <tr><th>Entity</th><th>Closed</th><th>Open with Infosys</th><th>Open with Bank</th><th>Total</th></tr>
+                </thead>
+                <tbody id="grandSummaryBody"></tbody>
+            </table>
+        </div>
+    </section>
+
     <!-- All Module Issues Data Section -->
-    <section class="card">
+    <section class="card" id="issuesTableSection">
         <div class="table-header-block">
             <div class="table-title-row">
                 <h2 id="tableHeading">All Module Issues Data</h2>
@@ -150,16 +263,14 @@
                     </select>
                 </div>
 
-                <!-- Closure Category Filter -->
+                <!-- Issue Status Filter -->
                 <div class="filter-field">
-                    <label>Closure Category:</label>
-                    <select id="filterClosureCategory" onchange="applyFilters()">
-                        <option value="">All Categories</option>
+                    <label>Issue Status:</label>
+                    <select id="filterStatus" onchange="applyFilters()">
+                        <option value="">All Statuses</option>
                         <option value="Closed">Closed</option>
-                        <option value="Closed with Fix">Closed with Fix</option>
-                        <option value="Closed with Clarification">Closed with Clarification</option>
-                        <option value="For Testing">For Testing</option>
-                        <option value="For New Requirement">For New Requirement</option>
+                        <option value="Open with Bank">Open with Bank</option>
+                        <option value="Open with Infosys and L3">Open with Infosys & L3</option>
                     </select>
                 </div>
 
@@ -171,7 +282,7 @@
 
                 <button class="btn btn-secondary" onclick="resetAllFilters()">Reset Filters</button>
             </div>
-        </div> <!-- ✅ Closed table-header-block here -->
+        </div>
 
         <!-- Table View with Selection Checkboxes -->
         <div class="table-wrapper">
@@ -186,6 +297,7 @@
                     <th>Issue Description</th>
                     <th>L2 Analysis</th>
                     <th>TOL ID</th>
+                    <th>L3 Assignee</th>
                     <th>L3 Updates</th>
                     <th>Issue Status</th>
                     <th>Closure Category</th>
@@ -210,7 +322,7 @@
     </section>
 
     <!-- Compact Visual Charts Section (Below Table) -->
-    <section class="card charts-container">
+    <section class="card charts-container" id="chartsSection">
         <div class="chart-box">
             <h3>📊 Issue Status Distribution</h3>
             <div class="chart-canvas-wrapper">
@@ -331,7 +443,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Assignee</label>
+                    <label>L3 Assignee</label>
+                    <input type="text" id="formL3Assignee" placeholder=" L3 Assignee Name">
+                </div>
+
+                <div class="form-group">
+                    <label>Assignee *</label>
                     <input type="text" id="formAssignee" placeholder="Assignee Name">
                 </div>
 

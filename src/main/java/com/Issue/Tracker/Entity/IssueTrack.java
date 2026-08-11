@@ -45,6 +45,10 @@ public class IssueTrack {
     @JsonProperty("tolId")
     private String tolId;
 
+    @Column(name = "l3_Assignee")
+    @JsonProperty("l3Assignee")
+    private String l3Assignee;
+
     @Column(name = "l3_updates_remarks", columnDefinition = "TEXT")
     @JsonProperty("l3UpdatesRemarks")
     private String l3UpdatesRemarks;
@@ -77,7 +81,7 @@ public class IssueTrack {
     public IssueTrack(Long id, String module, String entity,
                       LocalDate reportedDate, String environment,
                       String issueDescription, String l2Analysis,
-                      String tolId, String l3UpdatesRemarks,
+                      String tolId, String l3Assignee,String l3UpdatesRemarks,
                       LocalDate closureDate, String issueStatus,
                       String closureCategory, String assignee,
                       String coAssignee) {
@@ -89,6 +93,7 @@ public class IssueTrack {
         this.issueDescription = issueDescription;
         this.l2Analysis = l2Analysis;
         this.tolId = tolId;
+        this.l3Assignee = l3Assignee;
         this.l3UpdatesRemarks = l3UpdatesRemarks;
         this.closureDate = closureDate;
         this.issueStatus = issueStatus;
@@ -161,6 +166,14 @@ public class IssueTrack {
         this.tolId = tolId;
     }
 
+    public String getL3Assignee() {
+        return l3Assignee;
+    }
+
+    public void setL3Assignee(String l3Assignee) {
+        this.l3Assignee = l3Assignee;
+    }
+
     public String getL3UpdatesRemarks() {
         return l3UpdatesRemarks;
     }
@@ -220,6 +233,7 @@ public class IssueTrack {
                 ", issueDescription='" + issueDescription + '\'' +
                 ", l2Analysis='" + l2Analysis + '\'' +
                 ", tolId='" + tolId + '\'' +
+                ",l3Assignee='" +l3Assignee +'\''+
                 ", l3UpdatesRemarks='" + l3UpdatesRemarks + '\'' +
                 ", issueStatus='" + issueStatus + '\'' +
                 ", closureDate=" + closureDate +

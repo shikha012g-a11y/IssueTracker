@@ -12,6 +12,7 @@ CREATE TABLE Tracker(
   issue_description TEXT NOT NULL,
   l2_analysis TEXT,
   tol_id VARCHAR(100),
+  l3_assignee VARCHAR(255),
   l3_updates_remarks TEXT,
   issue_status VARCHAR(100) NOT NULL,    -- 'Closed', 'Open with Bank', 'Open with Infosys and L3'
   closure_date DATE,
