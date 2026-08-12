@@ -105,6 +105,10 @@
                 <div class="big-number" id="tolTotalCount">0</div>
             </div>
             <div class="metric-card card-bank">
+                <h3>Open with Bank</h3>
+                <div class="big-number" id="tolOpenBackCount">0</div>
+            </div>
+            <div class="metric-card card-bank">
                 <h3>Open with L2</h3>
                 <div class="big-number" id="tolOpenL2Count">0</div>
             </div>
@@ -141,6 +145,7 @@
                 <label>Filter by TOL Status:</label>
                 <select id="tolStatusFilter" onchange="window.filterTolTable()">
                     <option value="">All Statuses</option>
+                    <option value="Open with L2">Open with Bank</option>
                     <option value="Open with L2">Open with L2</option>
                     <option value="Open with L3">Open with L3</option>
                     <option value="Closed">Closed</option>
@@ -359,6 +364,7 @@
                     <label>Closure Category:</label>
                     <select id="filterClosureCategory" onchange="window.applyFilters()">
                         <option value="">All Categories</option>
+                        <option value="Closed with Fix">Closed</option>
                         <option value="Closed with Fix">Closed with Fix</option>
                         <option value="Closed with Clarification">Closed with Clarification</option>
                         <option value="For Testing">For Testing</option>
@@ -518,6 +524,7 @@
                     <label>Closure Category</label>
                     <select id="formClosureCategory">
                         <option value="">-- Select Closure Category --</option>
+                        <option value="Closed with Fix">Closed</option>
                         <option value="Closed with Fix">Closed with Fix</option>
                         <option value="Closed with Clarification">Closed with Clarification</option>
                         <option value="For Testing">For Testing</option>
